@@ -1,0 +1,58 @@
+/* ============================================================
+   Fitz feedback layer — highlight + pin comments.
+   Toolbar/panel/editor are fixed chrome (hidden in print).
+   .er-hl wraps highlighted text; #er-selbtn floats on selection.
+   ============================================================ */
+#er-bar{position:fixed;left:14px;bottom:14px;z-index:99999;display:flex;gap:6px;align-items:center;font-family:'Inter',system-ui,sans-serif;font-size:12px;background:#131018;color:#fff;border:1px solid #2a2730;border-radius:10px;padding:6px 8px;box-shadow:0 6px 22px rgba(0,0,0,.45)}
+#er-bar button{font:inherit;cursor:pointer;border:1px solid #3a3640;background:#1d1a24;color:#eee;border-radius:7px;padding:5px 9px}
+#er-bar button:hover{border-color:#ea7430}
+#er-bar button.on{background:#ea7430;color:#1a1a1a;border-color:#ea7430;font-weight:700}
+#er-bar .cnt{color:#ea7430;font-weight:700;min-width:14px;text-align:center}
+#er-bar .er-brand{font-weight:800;letter-spacing:.02em;padding-right:4px;color:#ea7430}
+
+/* pin overlay + pins */
+.er-aov{position:absolute;inset:0;pointer-events:none;z-index:40}
+body.er-on .er-host{cursor:crosshair}
+.er-pin{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50% 50% 50% 2px;background:#ea7430;color:#1a1a1a;font:700 13px/26px 'Inter',sans-serif;text-align:center;border:2px solid #1a1a1a;box-shadow:0 2px 7px rgba(0,0,0,.5);pointer-events:auto;cursor:pointer;z-index:45;transition:opacity .2s}
+.er-pin.er-resolved{opacity:.38;filter:grayscale(.6)}
+.er-pin .er-dot{position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:#e0492f;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.2)}
+
+/* text highlights */
+.er-hl{background:linear-gradient(transparent 52%, rgba(234,116,48,.42) 52%);cursor:pointer;border-radius:1px;transition:background .15s;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.er-hl:hover,.er-hl.er-active{background:rgba(234,116,48,.55)}
+.er-hl.er-resolved{background:linear-gradient(transparent 58%, rgba(140,140,140,.32) 58%)}
+
+/* floating "comment" button shown on a text selection */
+#er-selbtn{position:fixed;z-index:100002;transform:translate(-50%,-100%);margin-top:-8px;background:#131018;color:#fff;border:1px solid #ea7430;border-radius:9px;padding:7px 12px;font:600 12.5px 'Inter',system-ui,sans-serif;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.45);white-space:nowrap;display:none}
+#er-selbtn.show{display:block}
+#er-selbtn:hover{background:#ea7430;color:#1a1a1a;border-color:#ea7430}
+
+/* threaded editor popover */
+.er-ed{position:fixed;z-index:100000;width:320px;background:#fff;border:1px solid #d8d2c5;border-radius:10px;box-shadow:0 12px 34px rgba(0,0,0,.3);padding:10px;font-family:'Inter',sans-serif;max-height:70vh;display:flex;flex-direction:column}
+.er-ed .er-anchor-bar{font-size:11px;color:#83858a;background:#f8f6f2;border-radius:5px;padding:4px 7px;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.er-thread{flex:1;overflow-y:auto;min-height:48px;margin-bottom:8px;display:flex;flex-direction:column;gap:6px}
+.er-msg{border-radius:7px;padding:7px 10px;font-size:12.5px;line-height:1.4;color:#1a1a1a}
+.er-msg.them{background:#f0eee9;border:1px solid #e7e1d4}
+.er-msg .er-by{font-weight:700;font-size:11px;color:#83858a;margin-bottom:3px}
+.er-name-row input{width:100%;padding:6px 8px;margin-bottom:6px;border:1px solid #e0dacd;border-radius:6px;font:12px 'Inter',sans-serif;color:#1a1a1a;box-sizing:border-box}
+.er-reply-row{display:flex;flex-direction:column;gap:5px}
+.er-reply-row textarea{width:100%;height:58px;border:1px solid #d8d2c5;border-radius:6px;padding:7px;font:13px/1.45 'Inter',sans-serif;resize:vertical;box-sizing:border-box;color:#1a1a1a}
+.er-ed .r{display:flex;justify-content:space-between;gap:6px;margin-top:5px;align-items:center;flex-wrap:wrap}
+.er-ed button{font:12px 'Inter',sans-serif;cursor:pointer;border-radius:6px;padding:5px 10px;border:1px solid #ccc;background:#f3f3f3;color:#1a1a1a}
+.er-ed button.s{background:#ea7430;border-color:#ea7430;font-weight:700}
+.er-ed button.d{background:#fff;color:#e0492f;border-color:#eeb4ab}
+.er-ed button.rv{background:#fff;color:#1f9d6b;border-color:#a3d9c0}
+.er-ed button.ropen{background:#fff;color:#7c5ab8;border-color:#c9b8e8}
+
+/* notes panel */
+#er-pnl{position:fixed;right:0;top:0;bottom:0;width:340px;background:#faf6ef;border-left:1px solid #d8d2c5;z-index:99998;transform:translateX(100%);transition:transform .2s;overflow:auto;padding:14px 16px;font-family:'Inter',sans-serif;color:#1a1a1a}
+#er-pnl.open{transform:none}
+#er-pnl h3{font-family:'Inter',sans-serif;font-weight:800;text-transform:uppercase;font-size:13px;letter-spacing:.04em;margin:14px 0 4px;color:#1a1a1a}
+#er-pnl .it{background:#fff;border:1px solid #e7e1d4;border-left:3px solid #ea7430;border-radius:6px;padding:7px 10px;margin:6px 0;font-size:13px;cursor:pointer;line-height:1.35}
+#er-pnl .it .er-kind{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#b9852a}
+#er-pnl .it.resolved{opacity:.5;border-left-color:#aaa}
+
+#er-toast{position:fixed;left:14px;bottom:58px;z-index:100001;background:#1f9d6b;color:#fff;padding:8px 12px;border-radius:8px;font:13px 'Inter',sans-serif;opacity:0;transition:opacity .2s;pointer-events:none}
+#er-toast.show{opacity:1}
+
+@media print{#er-bar,#er-pnl,.er-ed,.er-pin,#er-toast,#er-selbtn{display:none!important}.er-hl{background:none!important}}

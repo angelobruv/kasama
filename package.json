@@ -1,0 +1,17 @@
+{
+  "name": "kasama",
+  "version": "0.1.0",
+  "description": "Open-source feedback layer — highlight any line, drop a comment, on any page.",
+  "license": "MIT",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "pg": "^8.13.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
