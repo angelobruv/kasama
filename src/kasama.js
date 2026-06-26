@@ -25,7 +25,7 @@
   if (!containers.length) return;
 
   var notes = [];
-  var mode = false, ed = null, tst, showResolved = false, _t = null, _suppressClick = false;
+  var mode = false, ed = null, tst, showResolved = false, _t = null, _suppressClick = false, hidden = false;
 
   /* --- container setup: id, relative pos, pin overlay --- */
   containers.forEach(function (c, i) {
@@ -108,7 +108,7 @@
       sp.setAttribute('data-num', num);
       try { r.surroundContents(sp); } catch (x2) { continue; }
       sp.addEventListener('click', (function (nn) {
-        return function (ev) { ev.stopPropagation(); var n = noteByNum(nn); if (n) edit(n, ev.clientX, ev.clientY); };
+        return function (ev) { if (hidden) return; ev.stopPropagation(); var n = noteByNum(nn); if (n) edit(n, ev.clientX, ev.clientY); };
       })(num));
     }
   }
@@ -200,7 +200,7 @@
   var selbtn = document.createElement('div'); selbtn.id = 'er-selbtn'; selbtn.textContent = '💬 Comment'; document.body.appendChild(selbtn);
   function hideSel() { selbtn.classList.remove('show'); }
   function onSelect() {
-    if (ed) return;
+    if (ed || hidden) return hideSel();
     var sel = window.getSelection();
     if (!sel || sel.isCollapsed || !sel.rangeCount) return hideSel();
     var range = sel.getRangeAt(0);
@@ -236,6 +236,7 @@
   }, true);
   window.addEventListener('click', function (ev) {
     if (ev.target.closest('#er-bar,#er-pnl,.er-ed,.er-pin,#er-selbtn,.er-hl')) return;
+    if (hidden) return; /* overlay hidden → page is read-only, no note drops */
     if (ev.target.closest('a,button,input,textarea,select,label,[contenteditable]')) return; /* let interactive elements (forms/links) work */
     if (_suppressClick) { _suppressClick = false; return; }   /* just dismissed an editor — don't drop a note */
     var c = ev.target.closest(ROOTSEL); if (!c || containers.indexOf(c) < 0) return;
@@ -252,7 +253,7 @@
 
   /* --- toolbar --- */
   var bar = document.createElement('div'); bar.id = 'er-bar';
-  bar.innerHTML = '<span class="er-brand">✦ Feedback</span><button class="t" title="Click anywhere to drop a numbered pin">✎ Pin</button><span class="cnt">0</span><button class="pn">Notes</button><button class="sr">Resolved</button><button class="cp">Copy</button>';
+  bar.innerHTML = '<span class="er-brand">✦ Feedback</span><button class="t" title="Click anywhere to drop a numbered pin">✎ Pin</button><span class="cnt">0</span><button class="pn">Notes</button><button class="sr">Resolved</button><button class="hd" title="Hide all comments to see the clean page">👁 Hide</button><button class="cp">Copy</button>';
   document.body.appendChild(bar);
   bar.addEventListener('mousedown', function (ev) { ev.stopPropagation(); });
   bar.addEventListener('click', function (ev) { ev.stopPropagation(); });
@@ -266,6 +267,19 @@
   bar.querySelector('.pn').addEventListener('click', function () { document.getElementById('er-pnl').classList.toggle('open'); panel(); });
   var srBtn = bar.querySelector('.sr');
   srBtn.addEventListener('click', function () { showResolved = !showResolved; srBtn.classList.toggle('on', showResolved); render(); panel(); });
+  var hdBtn = bar.querySelector('.hd');
+  hdBtn.addEventListener('click', function () {
+    hidden = !hidden;
+    document.body.classList.toggle('er-hidden', hidden);
+    hdBtn.classList.toggle('on', hidden);
+    hdBtn.textContent = hidden ? '👁 Show' : '👁 Hide';
+    if (hidden) {
+      close(); hideSel();
+      if (mode) { mode = false; document.body.classList.remove('er-on'); bt.classList.remove('on'); bt.textContent = '✎ Pin'; }
+      var op = document.getElementById('er-pnl'); if (op) op.classList.remove('open');
+    }
+    toast(hidden ? 'Comments hidden — page only' : 'Comments shown');
+  });
   bar.querySelector('.cp').addEventListener('click', copy);
 
   function cnt() {

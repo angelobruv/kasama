@@ -55,4 +55,11 @@ body.er-on .er-host{cursor:crosshair}
 #er-toast{position:fixed;left:14px;bottom:58px;z-index:100001;background:#1f9d6b;color:#fff;padding:8px 12px;border-radius:8px;font:13px 'Inter',sans-serif;opacity:0;transition:opacity .2s;pointer-events:none}
 #er-toast.show{opacity:1}
 
+/* "Hide" toggle — clear all comments so the clean page shows; keep the toolbar to toggle back */
+body.er-hidden .er-pin{display:none!important}
+body.er-hidden .er-aov{display:none!important}
+body.er-hidden #er-selbtn,body.er-hidden .er-ed,body.er-hidden #er-pnl{display:none!important}
+body.er-hidden .er-host{cursor:auto!important}
+body.er-hidden .er-hl{background:none!important;cursor:auto;border-radius:0}
+
 @media print{#er-bar,#er-pnl,.er-ed,.er-pin,#er-toast,#er-selbtn{display:none!important}.er-hl{background:none!important}}
